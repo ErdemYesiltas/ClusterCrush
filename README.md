@@ -343,4 +343,353 @@ const pool = new SymbolPool(symbolFactory, symbolConfig);
 
 ---
 
+## 🌐 Language / Dil
+
+**[🇹🇷 Türkçe](#clustercrush-🎮)** | **[🇺🇸 English](#clustercrush-🎮-english)**
+
+---
+
+# ClusterCrush 🎮 (English)
+
+A modern cluster crush game built with TypeScript using PixiJS, GSAP, and XState.
+
+## 🚀 Features
+
+- **PixiJS 8.11** modern graphics engine
+- **Pixi Sound** for sound effects and music
+- **XState 5.20** state machine-based game logic
+- **GSAP 3.12** advanced animations
+- **TypeScript** for type safety
+- **Vite** for fast development environment
+
+## 📦 Installation
+
+### Requirements
+
+- Node.js (v16 or higher)
+- npm or yarn
+
+### Clone the Project
+
+```bash
+git clone https://github.com/ErdemYesiltas/ClusterCrush.git
+cd ClusterCrush
+```
+
+### Install Dependencies
+
+```bash
+npm install
+```
+
+### Start Development Server
+
+```bash
+npm run dev
+```
+
+The game will run at `http://localhost:8082`.
+
+## 🎯 How to Play
+
+1. **Goal**: Match 3 or more gems of the same color by placing them adjacent to each other
+2. **Movement**: Drag gems from the bottom area and drop them onto the board
+3. **Score**: Earn points for each match
+4. **Moves**: You have a total of 25 moves
+5. **Winning**: Reach the target score of 500 points to win the game
+
+## 🛠️ Customization
+
+### Board Configuration
+
+You can customize the board in `GameContainer.ts`:
+
+```typescript
+const board = new Board(app, {
+  x: 396, // Board's x position
+  y: 40, // Board's y position
+  scale: 0.65, // Board's scale
+  rows: 5, // Number of rows
+  columns: 5, // Number of columns
+  cellSize: 150, // Cell size
+  cellTexture: 'cell', // Cell texture
+  optionCount: 3, // Number of gems in bottom area
+  symbols: {
+    // Gem configurations
+    b: {
+      visualType: 'sprite',
+      visualOptions: {
+        texture: 'gem-blue',
+        anchor: 0.5,
+        x: 75,
+        y: 75,
+      },
+      animations: commonAnims,
+    },
+    // Other gems...
+  },
+  maskOpts: {
+    x: 0,
+    y: 0,
+    width: 750,
+    height: 750,
+  },
+});
+```
+
+### Adding New Gem Types
+
+To add new gem types:
+
+```typescript
+const symbols = {
+  // Existing gems...
+  r: {
+    // Red gem
+    visualType: 'sprite',
+    visualOptions: {
+      texture: 'gem-red',
+      anchor: 0.5,
+      scale: 0.8,
+      x: 75,
+      y: 75,
+    },
+    animations: commonAnims,
+  },
+  o: {
+    // Orange gem
+    visualType: 'sprite',
+    visualOptions: {
+      texture: 'gem-orange',
+      anchor: 0.5,
+      tint: 0xff8800,
+      x: 75,
+      y: 75,
+    },
+    animations: commonAnims,
+  },
+};
+```
+
+### Customizing Animations
+
+You can modify gem animations:
+
+```typescript
+const commonAnims = {
+  idle: (visual: Sprite) => {
+    return new Promise<void>(resolve => {
+      // Fade in animation
+      gsap.fromTo(
+        visual,
+        { alpha: 0, scale: 0.5 },
+        { alpha: 1, scale: 1, duration: 0.8, ease: 'back.out(1.7)', onComplete: resolve },
+      );
+    });
+  },
+  cascade: (visual: Sprite) => {
+    return new Promise<void>(resolve => {
+      // Explosive exit animation
+      gsap.to(visual, {
+        alpha: 0,
+        scale: 2,
+        rotation: Math.PI,
+        duration: 0.6,
+        ease: 'power2.out',
+        onStart: () => {
+          try {
+            if (sound.exists('remove-symbol-sound')) {
+              sound.play('remove-symbol-sound');
+            }
+          } catch (error) {
+            console.error('Sound effect error:', error);
+          }
+        },
+        onComplete: resolve,
+      });
+    });
+  },
+};
+```
+
+### State Machine Customization
+
+You can customize game logic in `GameContainer.ts`:
+
+```typescript
+const customGameLogic = crushGameLogic.provide({
+  actions: {
+    onStart: () => {
+      // Actions on game start
+      console.log('Game started!');
+      // Play music
+      try {
+        if (sound.exists('main-music')) {
+          sound.play('main-music', { loop: true, volume: 0.5 });
+        }
+      } catch (error) {
+        console.error('Music playback error:', error);
+      }
+    },
+    onReset: () => {
+      // Actions on game reset
+      console.log('Game reset');
+    },
+    onEvaluation: () => {
+      // Actions after each move evaluation
+      console.log('Move being evaluated');
+    },
+    onCascade: () => {
+      // Actions during cascade process
+      console.log('Cascade process happening');
+    },
+    onWin: () => {
+      // Actions on game win
+      console.log('Game won!');
+      try {
+        if (sound.exists('win-sound')) {
+          sound.play('win-sound');
+        }
+      } catch (error) {
+        console.error('Win sound effect error:', error);
+      }
+    },
+    onLose: () => {
+      // Actions on game lose
+      console.log('Game lost!');
+      try {
+        if (sound.exists('lose-sound')) {
+          sound.play('lose-sound');
+        }
+      } catch (error) {
+        console.error('Lose sound effect error:', error);
+      }
+    },
+  },
+});
+```
+
+### Changing Game Parameters
+
+You can customize game parameters when creating the actor:
+
+```typescript
+this.actor = createActor(customGameLogic, {
+  input: {
+    board,
+    hud,
+    maxMoves: 30, // Maximum number of moves
+    winCheckFn: (moves: number, score: number) => {
+      // Win condition: 750 points within 20 moves
+      return moves <= 20 && score >= 750;
+    },
+    minWinCount: 4, // Minimum match count
+    calcScoreFn: (moves: number) => {
+      // Score calculation formula
+      return Math.pow(moves, 3) * 15; // Higher scoring
+    },
+  },
+});
+```
+
+### Adding Sound Effects
+
+You can add new sound files to `manifest.json`:
+
+```json
+{
+  "bundles": [
+    {
+      "name": "default",
+      "assets": [
+        {
+          "alias": "explosion-sound",
+          "src": "sounds/explosion.mp3"
+        },
+        {
+          "alias": "combo-sound",
+          "src": "sounds/combo.mp3"
+        }
+      ]
+    }
+  ]
+}
+```
+
+And use them in code:
+
+```typescript
+// Combo sound effect
+if (comboCount > 5) {
+  sound.play('combo-sound');
+}
+
+// Explosion sound effect
+sound.play('explosion-sound', { volume: 0.8 });
+```
+
+### Build Testing
+
+```bash
+# Build the project
+npm run build
+
+# Test built files
+npm run preview
+```
+
+## 📁 Project Structure
+
+```
+src/
+├── core/                    # Game engine components
+│   ├── Board.ts            # Board logic
+│   ├── CrushGameState.ts   # State machine
+│   ├── HUD.ts              # UI components
+│   └── symbol/             # Gem components
+├── games/
+│   └── game-one/           # Game implementation
+│       ├── GameContainer.ts # Main game class
+│       ├── manifest.json   # Asset manifest
+│       └── options.ts      # Game options
+├── plugins/                # Custom plugins
+└── initApp.ts             # Application initialization
+```
+
+## 🎨 Asset Management
+
+### Adding Textures
+
+Add texture files to `public/assets/textures/` and define them in `manifest.json`:
+
+```json
+{
+  "alias": "gem-purple",
+  "src": ["textures/gem_purple.png"]
+}
+```
+
+### Adding Sound Files
+
+Add sound files to `public/assets/sounds/`:
+
+```json
+{
+  "alias": "power-up-sound",
+  "src": "sounds/power-up.mp3"
+}
+```
+
+## 📊 Performance Optimization
+
+### Using Sprite Pool
+
+```typescript
+// Customizing symbol pool
+const symbolFactory = SymbolPool.createSymbolFactory(symbolConfig);
+const pool = new SymbolPool(symbolFactory, symbolConfig);
+```
+
+---
+
 Made with ❤️ by [ErdemYesiltas](https://github.com/ErdemYesiltas)
