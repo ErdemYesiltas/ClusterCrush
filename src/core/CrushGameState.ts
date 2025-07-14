@@ -52,8 +52,16 @@ export interface CrushGameContext {
 // Event types
 export type CrushGameEvent =
   | { type: 'START' }
-  | { type: 'SYMBOL_DROPPED'; symbol: CascadeSymbol; dropInfo: { row: number; column: number; index: number } }
-  | { type: 'WINS_CHECKED'; hasWins: boolean; winData?: { winIndices: number[]; insertSymbols: string[] } }
+  | {
+      type: 'SYMBOL_DROPPED';
+      symbol: CascadeSymbol;
+      dropInfo: { row: number; column: number; index: number };
+    }
+  | {
+      type: 'WINS_CHECKED';
+      hasWins: boolean;
+      winData?: { winIndices: number[]; insertSymbols: string[] };
+    }
   | { type: 'CASCADE_DONE' }
   | { type: 'RESET' }
   | { type: 'RESTART_CLICKED' };
@@ -244,9 +252,12 @@ export const crushGameLogic = setup({
         const newScore = context.score + context.calcScoreFn(context.currentMove);
         console.log(`New score: ${newScore}`);
         context.hud?.updateScore(newScore);
-        context.score = newScore;
 
-        self.send({ type: 'WINS_CHECKED', hasWins: true, winData: { winIndices: uniqueWinIndices, insertSymbols } });
+        self.send({
+          type: 'WINS_CHECKED',
+          hasWins: true,
+          winData: { winIndices: uniqueWinIndices, insertSymbols },
+        });
         return {
           score: newScore,
         };
@@ -425,26 +436,29 @@ export const crushGameLogic = setup({
       on: {
         RESTART_CLICKED: 'reset',
       },
-      always: [
-        { target: 'gameWon', guard: 'isGameWon' },
-        { target: 'gameOver', guard: 'isGameOver' },
-        { target: 'checkingWins' },
-      ],
+      always: [{ target: 'gameOver', guard: 'isGameOver' }, { target: 'checkingWins' }],
     },
     checkingWins: {
       entry: 'checkForWins',
       on: {
-        WINS_CHECKED: [{ target: 'cascading', guard: 'hasWins' }, { target: 'playing' }],
+        WINS_CHECKED: [
+          { target: 'cascading', guard: 'hasWins' },
+          { target: 'gameWon', guard: 'isGameWon' },
+          { target: 'playing' },
+        ],
         RESTART_CLICKED: 'reset',
       },
     },
     cascading: {
       entry: 'processCascade',
       on: {
-        CASCADE_DONE: {
-          target: 'playing',
-          actions: 'findPossibleWins',
-        },
+        CASCADE_DONE: [
+          { target: 'gameWon', guard: 'isGameWon' },
+          {
+            target: 'playing',
+            actions: 'findPossibleWins',
+          },
+        ],
         RESTART_CLICKED: 'reset',
       },
     },
