@@ -4,6 +4,30 @@
       "name": "default",
       "assets": [
         {
+          "alias": "main-music",
+          "src": "sounds/main-music.mp3"
+        },
+        {
+          "alias": "button-sound",
+          "src": "sounds/button.mp3"
+        },
+        {
+          "alias": "drop-symbol-sound",
+          "src": "sounds/drop-symbol.mp3"
+        },
+        {
+          "alias": "lose-sound",
+          "src": "sounds/lose.mp3"
+        },
+        {
+          "alias": "remove-symbol-sound",
+          "src": "sounds/remove-symbol.mp3"
+        },
+        {
+          "alias": "win-sound",
+          "src": "sounds/win.mp3"
+        },
+        {
           "alias": "button",
           "src": ["textures/button.png"]
         },

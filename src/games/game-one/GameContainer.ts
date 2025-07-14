@@ -1,8 +1,10 @@
-import { Container, ContainerOptions, Application, Sprite, Assets, Text } from 'pixi.js';
+import { Container, ContainerOptions, Application, Sprite, Text } from 'pixi.js';
 import { Board, HUD } from '../../core';
 import { gsap } from 'gsap';
 import { CrushGameEvent, crushGameLogic, CrushGameType } from '../../core/CrushGameState';
 import { ActorRef, createActor } from 'xstate';
+import { sound } from '@pixi/sound';
+//import { OrientationSizer } from '../../core/utils/OrientationSizer';
 
 export class GameContainer extends Container {
   actor!: ActorRef<CrushGameType, any, CrushGameEvent>;
@@ -17,12 +19,11 @@ export class GameContainer extends Container {
     const commonAnims = {
       idle: (visual: Sprite) => {
         return new Promise<void>(resolve => {
-          gsap.fromTo(visual, { alpha: 0 }, { alpha: 1, duration: 1, onComplete: resolve });
+          gsap.fromTo(visual, { alpha: 0 }, { alpha: 1, duration: 0.5, onComplete: resolve });
         });
       },
       cascade: (visual: Sprite) => {
         return new Promise<void>(resolve => {
-          const sound = Assets.get('remove-symbol');
           gsap.fromTo(
             visual,
             { alpha: 1 },
@@ -30,11 +31,14 @@ export class GameContainer extends Container {
               alpha: 0,
               duration: 0.5,
               onStart: () => {
-                if (sound) {
-                  sound.play();
+                if (sound.exists('remove-symbol-sound')) {
+                  sound.play('remove-symbol-sound');
                 }
               },
               onComplete: () => {
+                if (sound.exists('drop-symbol-sound')) {
+                  sound.play('drop-symbol-sound');
+                }
                 resolve();
               },
             },
@@ -110,7 +114,41 @@ export class GameContainer extends Container {
     this.addChild(hud);
 
     // create game state machine
-    const customGameLogic = crushGameLogic.provide({});
+    const customGameLogic = crushGameLogic.provide({
+      actions: {
+        onStart: () => {
+          if (sound.exists('main-music')) {
+            sound.play('main-music', {
+              loop: true,
+              volume: 0.25,
+            });
+          }
+        },
+        onReset: () => {
+          // Reset işlemi - gerektiğinde ses efekti eklenebilir
+          console.log('Game reset');
+        },
+        onEvaluation: () => {
+          // Evaluation işlemi - gerektiğinde ses efekti eklenebilir
+          console.log('Game evaluation');
+        },
+        onCascade: () => {
+          // Cascade işlemi - gerektiğinde ses efekti eklenebilir
+          console.log('Game cascade');
+        },
+        onWin: () => {
+          if (sound.exists('win-sound')) {
+            sound.play('win-sound');
+          }
+        },
+        onLose: () => {
+          if (sound.exists('lose-sound')) {
+            sound.play('lose-sound');
+          }
+        },
+      },
+    });
+
     this.actor = createActor(customGameLogic, {
       input: {
         board,
@@ -123,6 +161,7 @@ export class GameContainer extends Container {
         calcScoreFn: (moves: number) => Math.pow(moves, 2) * 10,
       },
     }) as ActorRef<CrushGameType, any, CrushGameEvent>;
+
     this.actor.subscribe(snapshot => {
       switch (snapshot.value) {
         case 'gameOver':
@@ -133,9 +172,15 @@ export class GameContainer extends Container {
           break;
       }
     });
+
     this.actor.start();
 
     console.log(app);
+
+    window.addEventListener('resize', () => {
+      //! çalışmıyor
+      //OrientationSizer(app);
+    });
   }
 
   getPopup(): { header: Text; content: Text; modal: Sprite; button: Sprite } {
@@ -202,6 +247,9 @@ export class GameContainer extends Container {
     content.text = 'You have run out of moves. Try again!';
     (button.children[0] as Text).text = 'Restart';
     button.on('pointerup', () => {
+      if (sound.exists('button-sound')) {
+        sound.play('button-sound');
+      }
       this.actor.send({ type: 'RESTART_CLICKED' });
       this.removeChild(modal);
     });
@@ -217,6 +265,9 @@ export class GameContainer extends Container {
     content.text = `You have completed the game! \n YourScore: ${context.score} \n Moves Left: ${context.maxMoves - context.currentMove}`;
     (button.children[0] as Text).text = 'Play Again';
     button.on('pointerup', () => {
+      if (sound.exists('button-sound')) {
+        sound.play('button-sound');
+      }
       this.actor.send({ type: 'RESTART_CLICKED' });
       this.removeChild(modal);
     });

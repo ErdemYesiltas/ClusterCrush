@@ -1,15 +1,14 @@
-import { Application, ApplicationOptions, Assets, extensions, ResizePlugin } from 'pixi.js';
+import { Application, ApplicationOptions, Assets, extensions } from 'pixi.js';
 import { gsap } from 'gsap';
 import { PixiPlugin } from 'gsap/PixiPlugin';
-import { CustomResizePlugin } from './plugins/resize/ResizePlugin';
 import { GameObjectPlugin } from './plugins/game-object/GameObjectPlugin';
 
 // register the PixiPlugin with GSAP
 gsap.registerPlugin(PixiPlugin);
 
 // replace resize plugin with the one from the project
-extensions.remove(ResizePlugin);
-extensions.add(CustomResizePlugin);
+//extensions.remove(ResizePlugin);
+//extensions.add(CustomResizePlugin);
 extensions.add(GameObjectPlugin);
 
 // Initialize the PixiJS application

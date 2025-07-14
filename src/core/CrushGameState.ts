@@ -83,6 +83,13 @@ export const crushGameLogic = setup({
     hasWins: ({ event }) => event.type === 'WINS_CHECKED' && event.hasWins,
   },
   actions: {
+    // Override actions
+    onStart: () => {},
+    onReset: () => {},
+    onEvaluation: () => {},
+    onCascade: () => {},
+    onWin: () => {},
+    onLose: () => {},
     initialize: ({ context, self }) => {
       if (context.board) {
         context.board.removeAllListeners();
@@ -386,11 +393,11 @@ export const crushGameLogic = setup({
   },
   states: {
     initialize: {
-      entry: 'initialize',
+      entry: ['initialize', 'onStart'],
       always: { target: 'reset' },
     },
     reset: {
-      entry: ['resetGame', 'findPossibleWins'],
+      entry: ['resetGame', 'findPossibleWins', 'onReset'],
       always: { target: 'playing' },
     },
     playing: {
@@ -408,7 +415,7 @@ export const crushGameLogic = setup({
       always: [{ target: 'gameOver', guard: 'isGameOver' }, { target: 'checkingWins' }],
     },
     checkingWins: {
-      entry: 'checkForWins',
+      entry: ['checkForWins', 'onEvaluation'],
       on: {
         WINS_CHECKED: [
           { target: 'cascading', guard: 'hasWins' },
@@ -419,7 +426,7 @@ export const crushGameLogic = setup({
       },
     },
     cascading: {
-      entry: 'processCascade',
+      entry: ['processCascade', 'onCascade'],
       on: {
         CASCADE_DONE: [
           { target: 'gameWon', guard: 'isGameWon' },
@@ -432,14 +439,14 @@ export const crushGameLogic = setup({
       },
     },
     gameWon: {
-      entry: ['setGameWon', 'disableGame'],
+      entry: ['setGameWon', 'disableGame', 'onWin'],
       on: {
         RESET: 'reset',
         RESTART_CLICKED: 'reset',
       },
     },
     gameOver: {
-      entry: ['setGameOver', 'disableGame'],
+      entry: ['setGameOver', 'disableGame', 'onLose'],
       on: {
         RESET: 'reset',
         RESTART_CLICKED: 'reset',

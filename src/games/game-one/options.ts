@@ -1,6 +1,6 @@
 import { ApplicationOptions, isMobile } from 'pixi.js';
-import type { ResizeOptions } from '../../plugins/resize/ResizePlugin';
 import manifestBundle from './manifest.json';
+import { ResizeOptions } from '../../core/utils/OrientationSizer';
 
 export function getOptions(): Partial<ApplicationOptions> {
   const gameOptions: Partial<ApplicationOptions> = {
@@ -25,10 +25,14 @@ export function getOptions(): Partial<ApplicationOptions> {
   if (isMobile.any) {
     resizeOptions.forceOrientation = 'auto';
     resizeOptions.landscape = {
+      width: 1280,
+      height: 720,
       minWidth: 1280,
       minHeight: 720,
     };
     resizeOptions.portrait = {
+      width: 720,
+      height: 1280,
       minWidth: 720,
       minHeight: 1280,
     };
