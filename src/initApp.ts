@@ -12,8 +12,6 @@ extensions.remove(ResizePlugin);
 extensions.add(CustomResizePlugin);
 extensions.add(GameObjectPlugin);
 
-console.log('extensions', extensions);
-
 // Initialize the PixiJS application
 let app: Application;
 

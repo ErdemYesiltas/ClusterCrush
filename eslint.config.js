@@ -2,7 +2,6 @@ import js from '@eslint/js';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
 import prettier from 'eslint-config-prettier';
-import prettierPlugin from 'eslint-plugin-prettier';
 
 export default [
   js.configs.recommended,
@@ -10,7 +9,6 @@ export default [
     files: ['**/*.{js,mjs,cjs,ts,tsx}'],
     plugins: {
       '@typescript-eslint': tseslint,
-      prettier: prettierPlugin,
     },
     languageOptions: {
       parser: tsparser,
@@ -51,30 +49,6 @@ export default [
       'object-shorthand': 'error',
       'prefer-arrow-callback': 'error',
       'prefer-template': 'error',
-      'template-curly-spacing': 'error',
-      'arrow-spacing': 'error',
-      'comma-dangle': ['error', 'always-multiline'],
-      quotes: ['error', 'single', { allowTemplateLiterals: true }],
-      semi: ['error', 'always'],
-      indent: ['error', 2],
-      'linebreak-style': ['error', 'unix'],
-      'max-len': ['error', { code: 120, ignoreComments: true }],
-      'no-trailing-spaces': 'error',
-      'eol-last': 'error',
-      'no-multiple-empty-lines': ['error', { max: 2, maxEOF: 1 }],
-
-      // Prettier integration
-      'prettier/prettier': [
-        'error',
-        {
-          singleQuote: true,
-          semi: true,
-          trailingComma: 'all',
-          tabWidth: 2,
-          printWidth: 120,
-          endOfLine: 'lf',
-        },
-      ],
     },
   },
   // Special rules for type declaration files

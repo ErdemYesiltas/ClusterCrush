@@ -152,7 +152,6 @@ export const crushGameLogic = setup({
 
       // Eğer aynı ID'ye sahip semboller swap edilmeye çalışılıyorsa, win verme
       if (droppedSymbolId === targetSymbolId) {
-        console.log('Same symbol IDs, no win allowed:', droppedSymbolId, '===', targetSymbolId);
         context.board.resetDragDropSymbolPosition(event.symbol);
         self.send({ type: 'WINS_CHECKED', hasWins: false });
         return {};
@@ -198,7 +197,6 @@ export const crushGameLogic = setup({
 
       // Yatay win kontrolü
       if (horizontalIndices.length >= context.minWinCount) {
-        console.log('Horizontal win found!', horizontalIndices);
         winIndices.push(...horizontalIndices);
         hasWin = true;
       }
@@ -231,7 +229,6 @@ export const crushGameLogic = setup({
 
       // Dikey win kontrolü
       if (verticalIndices.length >= context.minWinCount) {
-        console.log('Vertical win found!', verticalIndices);
         winIndices.push(...verticalIndices);
         hasWin = true;
       }
@@ -240,9 +237,6 @@ export const crushGameLogic = setup({
       const uniqueWinIndices = [...new Set(winIndices)];
 
       if (hasWin && uniqueWinIndices.length > 0) {
-        // Win var, ŞIMDI sembolü board'a yerleştir
-        console.log('Win found! Placing symbol and starting cascade. Indices:', uniqueWinIndices);
-
         context.board.handleSymbolDrop(event.symbol, event.dropInfo);
 
         // Random semboller üret
@@ -250,7 +244,6 @@ export const crushGameLogic = setup({
 
         // Score'u güncelle
         const newScore = context.score + context.calcScoreFn(context.currentMove);
-        console.log(`New score: ${newScore}`);
         context.hud?.updateScore(newScore);
 
         self.send({
@@ -263,7 +256,6 @@ export const crushGameLogic = setup({
         };
       } else {
         // Win yok, drag drop symbol'ü eski pozisyonuna geri döndür (board'u hiç değiştirmediğimiz için sadece visual reset)
-        console.log('No win found, resetting symbol position');
         context.board.resetDragDropSymbolPosition(event.symbol);
         self.send({ type: 'WINS_CHECKED', hasWins: false });
         return {};
@@ -271,7 +263,6 @@ export const crushGameLogic = setup({
     }),
     processCascade: ({ context, event, self }) => {
       if (context.board && event.type === 'WINS_CHECKED' && event.hasWins) {
-        console.log('Processing cascade...');
         // Cascade'i tetikle
         context.board
           .cascade(event.winData?.winIndices ?? [], event.winData?.insertSymbols ?? [], 'cascade')
@@ -285,29 +276,7 @@ export const crushGameLogic = setup({
       const rows = context.board.options.rows ?? 5;
       const columns = context.board.options.columns ?? 5;
 
-      // dragDropSymbols dizisindeki sembol ID'lerini al
-      console.log(
-        'dragDropSymbols:',
-        context.board.dragDropSymbols.map(s => s.id),
-      );
-      console.log(
-        'dragDropSymbols details:',
-        context.board.dragDropSymbols.map((symbol, index) => ({
-          index,
-          symbol,
-          id: symbol.id,
-          symbolData: symbol
-            ? {
-                name: symbol.name,
-                uid: symbol.uid,
-              }
-            : null,
-        })),
-      );
-
       const dragDropSymbolIds = context.board.dragDropSymbols.map(symbol => symbol.id).filter(Boolean) as string[];
-
-      console.log('dragDropSymbolIds:', dragDropSymbolIds);
 
       // Sadece dragDropSymbols'deki ID'lere göre filtreleme yap
       const targetSymbolIds = new Set(dragDropSymbolIds);

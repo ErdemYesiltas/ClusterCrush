@@ -117,7 +117,6 @@ export class GameContainer extends Container {
         hud,
         maxMoves: 25,
         winCheckFn: (moves: number, score: number) => {
-          console.log(`Win check: moves=${moves}, score=${score}`);
           return moves <= 25 && score >= 500;
         },
         minWinCount: 3,
@@ -125,7 +124,6 @@ export class GameContainer extends Container {
       },
     }) as ActorRef<CrushGameType, any, CrushGameEvent>;
     this.actor.subscribe(snapshot => {
-      console.log('Game state snapshot:', snapshot);
       switch (snapshot.value) {
         case 'gameOver':
           this.showGameOver();
@@ -137,7 +135,7 @@ export class GameContainer extends Container {
     });
     this.actor.start();
 
-    console.log(app, this.actor, hud);
+    console.log(app);
   }
 
   getPopup(): { header: Text; content: Text; modal: Sprite; button: Sprite } {
@@ -199,7 +197,6 @@ export class GameContainer extends Container {
   }
 
   showGameOver(): void {
-    console.log('Game Over! Show game over screen or reset options.');
     const { header, content, modal, button } = this.getPopup();
     header.text = 'GAME OVER';
     content.text = 'You have run out of moves. Try again!';
@@ -214,7 +211,6 @@ export class GameContainer extends Container {
   }
 
   showGameWon(): void {
-    console.log('Game Won! Show game won screen or reset options.');
     const context = this.actor.getSnapshot().context;
     const { header, content, modal, button } = this.getPopup();
     header.text = 'GAME WON';

@@ -12,6 +12,7 @@ export function getOptions(): Partial<ApplicationOptions> {
     antialias: true,
     resolution: 1,
     sharedTicker: true,
+    resizeTo: window, // Add this to enable resize plugin
   };
   // desktop options
   const resizeOptions: ResizeOptions = {
@@ -24,12 +25,12 @@ export function getOptions(): Partial<ApplicationOptions> {
   if (isMobile.any) {
     resizeOptions.forceOrientation = 'auto';
     resizeOptions.landscape = {
-      minWidth: 800,
-      minHeight: 600,
+      minWidth: 1280,
+      minHeight: 720,
     };
     resizeOptions.portrait = {
-      minWidth: 600,
-      minHeight: 800,
+      minWidth: 720,
+      minHeight: 1280,
     };
   }
   gameOptions.resizeOpts = resizeOptions;
