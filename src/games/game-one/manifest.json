@@ -1,0 +1,41 @@
+{
+  "bundles": [
+    {
+      "name": "default",
+      "assets": [
+        {
+          "alias": "button",
+          "src": ["textures/button.png"]
+        },
+        {
+          "alias": "cell",
+          "src": ["textures/cell.png"]
+        },
+        {
+          "alias": "gem-blue",
+          "src": ["textures/gem_blue.png"]
+        },
+        {
+          "alias": "gem-green",
+          "src": ["textures/gem_green.png"]
+        },
+        {
+          "alias": "gem-pink",
+          "src": ["textures/gem_pink.png"]
+        },
+        {
+          "alias": "gem-yellow",
+          "src": ["textures/gem_yellow.png"]
+        },
+        {
+          "alias": "info",
+          "src": ["textures/info.png"]
+        },
+        {
+          "alias": "modal",
+          "src": ["textures/modal.png"]
+        }
+      ]
+    }
+  ]
+}
